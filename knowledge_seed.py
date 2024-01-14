@@ -1,7 +1,8 @@
 from tkinter import *
 import tkinter.messagebox as mb
+import tkinter.filedialog as fi
 import webbrowser
-import pickle
+import os
 
 root = Tk()
 root.title("KNOWLEDGE SEED")
@@ -38,8 +39,39 @@ listbox.bind(
     show_selected,
     )
 
-scrollbar.config(command=listbox.yview)
+file = None
 
+def saveFile(self):
+  global file
+  if file == None:
+    file = fi.asksaveasfilename(
+      initialdir=".",
+      title="select ksファイル",
+      initialfile= 'untitled.ks', 
+      defaultextension=".ks",
+      filetypes=[("ks files", "*.ks")])
+    if file == "":
+      file = None
+      return "nosaved"
+    else:
+      f = open(file, "w", encoding="UTF-8",errors="ignore")
+      for i in range(len(knowledge_list)):
+        f.write(knowledge_list[i]+","+list_url[i]+"\n")
+      f.close()
+      root.title(os.path.basename(file))
+  else:
+    if type(file) != str:
+      file = file.name
+    file_path = os.path.dirname(file)
+    f = open(file_path, "w", encoding="UTF-8", errors="ignore")
+    for i in range(len(knowledge_list)):
+      f.write(knowledge_list[i]+","+list_url[i]+"\n")
+    f.close()
+    
+
+root.bind_all("<Control-KeyPress-s>", saveFile)
+
+scrollbar.config(command=listbox.yview)
 frame.pack(pady=20)
 scrollbar.pack(side=RIGHT, fill="y")
 listbox.pack()
