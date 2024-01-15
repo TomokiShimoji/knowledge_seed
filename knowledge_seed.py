@@ -41,7 +41,7 @@ listbox.bind(
 
 file = None
 
-def saveFile(self):
+def saveFile():
   global file
   if file == None:
     file = fi.asksaveasfilename(
@@ -56,20 +56,41 @@ def saveFile(self):
     else:
       f = open(file, "w", encoding="UTF-8",errors="ignore")
       for i in range(len(knowledge_list)):
-        f.write(knowledge_list[i]+","+list_url[i]+"\n")
+        f.write(knowledge_list[i]+","+list_url[i])
       f.close()
-      root.title(os.path.basename(file))
+      file = None
   else:
     if type(file) != str:
       file = file.name
     file_path = os.path.dirname(file)
     f = open(file_path, "w", encoding="UTF-8", errors="ignore")
     for i in range(len(knowledge_list)):
-      f.write(knowledge_list[i]+","+list_url[i]+"\n")
+      f.write(knowledge_list[i]+","+list_url[i])
+    file = None
     f.close()
     
-
-root.bind_all("<Control-KeyPress-s>", saveFile)
+def openFile():
+  global knowledge_list, list_url
+  file = fi.askopenfilename(
+    initialdir=".",
+    title="select ksファイル", 
+    defaultextension=".ks",
+    filetypes=[("ks files", "*.ks")])
+  if file == "":
+    file = None
+    return "noopened"
+  else:
+    f = open(file, "r", encoding="UTF-8",errors="ignore")
+    knowledge_list = []
+    list_url = []
+    for i in f.readlines():
+      knowledge_list.append(i.split(",")[0])
+      list_url.append(i.split(",")[1])
+      listbox.insert(END, i.split(",")[0])
+    f.close()
+    print(knowledge_list)
+    print(list_url)
+    file = None
 
 scrollbar.config(command=listbox.yview)
 frame.pack(pady=20)
@@ -80,10 +101,24 @@ def click_button():
   knowledge_list.append(input_field1.get())  
   list_url.append(input_field2.get())
   listbox.insert(END, input_field1.get())
-  print(list_url)
   print(knowledge_list)
+  print(list_url)
 
 button1 = Button(text="実行", command = click_button)
 button1.place(x=40, y=80)
+
+button2 = Button(text="保存", command = saveFile)
+button2.pack()
+
+button3 = Button(text="ファイルを開く", command = openFile)
+button3.pack()
+
+def on_window_click(event):
+  x, y = event.x, event.y
+  if not (0 <= x < listbox.winfo_width() and 0 <= y < listbox.winfo_height()):
+    # Listbox以外の領域をクリックした場合、選択を解除する
+    listbox.selection_clear(0, END)
+
+root.bind("<Button-1>", on_window_click)
 
 root.mainloop()
