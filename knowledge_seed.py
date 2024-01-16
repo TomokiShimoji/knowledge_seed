@@ -25,17 +25,18 @@ list_url = []
 
 frame = Frame(master=None)
 scrollbar = Scrollbar(master=frame,orient=VERTICAL)
-listbox = Listbox(master=frame,listvariable=StringVar(value=knowledge_list), takefocus=True, justify=LEFT, yscrollcommand=scrollbar.set)
+listbox = Listbox(master=frame,listvariable=StringVar(value=knowledge_list), takefocus=True, justify=LEFT, yscrollcommand=scrollbar.set, selectmode=MULTIPLE)
 
 def show_selected(event):
     n = listbox.curselection()   #選択項目のindex取得
-    try:
-      webbrowser.open(list_url[n[0]])
-    except:
-      mb.showinfo("Error", "このURLのウェブサイトは存在しません")
+    for i in n:
+      try:
+        webbrowser.open(list_url[i])
+      except:
+        mb.showinfo("Error", "このURLのウェブサイトは存在しません")
 
 listbox.bind(
-    "<<ListboxSelect>>",
+    "<Double-Button-1>",
     show_selected,
     )
 
@@ -92,6 +93,7 @@ def openFile():
     print(list_url)
     file = None
 
+
 scrollbar.config(command=listbox.yview)
 frame.pack(pady=20)
 scrollbar.pack(side=RIGHT, fill="y")
@@ -105,13 +107,25 @@ def click_button():
   print(list_url)
 
 button1 = Button(text="実行", command = click_button)
-button1.place(x=40, y=80)
+button1.place(x=60, y=80)
 
 button2 = Button(text="保存", command = saveFile)
 button2.pack()
 
 button3 = Button(text="ファイルを開く", command = openFile)
 button3.pack()
+
+def deleteword():
+  n = listbox.curselection()   #選択項目のindex取得
+  for i in n:
+    listbox.delete(i)
+  knowledge_list.pop(i)
+  list_url.pop(i)
+  print(knowledge_list)
+  print(list_url)
+
+button4 = Button(text="削除", command = deleteword)
+button4.place(x=60, y=110)
 
 def on_window_click(event):
   x, y = event.x, event.y
