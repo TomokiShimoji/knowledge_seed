@@ -57,7 +57,7 @@ def saveFile():
     else:
       f = open(file, "w", encoding="UTF-8",errors="ignore")
       for i in range(len(knowledge_list)):
-        f.write(knowledge_list[i]+","+list_url[i])
+        f.write(knowledge_list[i]+","+list_url[i]+"\n")
       f.close()
       file = None
   else:
@@ -66,7 +66,7 @@ def saveFile():
     file_path = os.path.dirname(file)
     f = open(file_path, "w", encoding="UTF-8", errors="ignore")
     for i in range(len(knowledge_list)):
-      f.write(knowledge_list[i]+","+list_url[i])
+      f.write(knowledge_list[i]+","+list_url[i]+"\n")
     file = None
     f.close()
     
@@ -84,6 +84,7 @@ def openFile():
     f = open(file, "r", encoding="UTF-8",errors="ignore")
     knowledge_list = []
     list_url = []
+    listbox.delete(0, END)
     for i in f.readlines():
       knowledge_list.append(i.split(",")[0])
       list_url.append(i.split(",")[1])
@@ -117,10 +118,15 @@ button3.pack()
 
 def deleteword():
   n = listbox.curselection()   #選択項目のindex取得
+  if not n:
+    print("選択されていません")
+    return
+  adjustment = 0
   for i in n:
-    listbox.delete(i)
-  knowledge_list.pop(i)
-  list_url.pop(i)
+    listbox.delete(i- adjustment)
+    knowledge_list.pop(i-adjustment)
+    list_url.pop(i-adjustment)
+    adjustment += 1
   print(knowledge_list)
   print(list_url)
 
